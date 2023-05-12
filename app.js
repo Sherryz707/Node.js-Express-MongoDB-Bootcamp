@@ -3,6 +3,7 @@ const morgan = require('morgan');
 
 const tourRouter = require('./routes/tourRoutes');
 const userRouter = require('./routes/userRoutes');
+const globalErrorHandler = require('./controller/errorHandler');
 
 const app = express(); //this is a router on which we have our routes
 
@@ -67,4 +68,11 @@ app.use(express.static(`${__dirname}/public`)); //serving static files from fold
 app.use('/api/v1/tours', tourRouter); //tourRouter is the middleware we want to apply on specific url
 app.use('/api/v1/users', userRouter);
 
+app.all('*', (req, res, next) => {
+  const err = new Error(`Can't find ${req.originalUrl} on server`);
+  err.statusCode = 404;
+  next(err);
+});
+
+app.use(globalErrorHandler);
 module.exports = app;
