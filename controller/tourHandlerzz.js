@@ -79,7 +79,7 @@ exports.getTour = (req, res) => {
   // });
 };
 exports.updateTour = (req, res) => {
-  r res.status(200).json({
+  res.status(200).json({
     status: 'success'
   });
 };

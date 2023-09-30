@@ -1,12 +1,11 @@
-/* eslint-disable no-console */
-/* eslint-disable no-unused-vars */
 const fs = require('fs');
 const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 const Tour = require('./../../models/tourModel');
+const User = require('./../../models/userModel');
+const Review = require('./../../models/reviewModel');
 
-dotenv.config({ path: './config.env' });
-
+dotenv.config({ path: './../../config.env' });
 const app = require('./../../app');
 
 const DB = process.env.DATABASE.replace(
@@ -24,16 +23,20 @@ mongoose
     console.log(`connection: ${connectionObj.connection}`);
   });
 
-const tours = JSON.parse(
-  fs.readFileSync(`${__dirname}/tours-simple.json`, 'utf-8')
+const tours = JSON.parse(fs.readFileSync(`${__dirname}/tours.json`, 'utf-8'));
+const users = JSON.parse(fs.readFileSync(`${__dirname}/users.json`, 'utf-8'));
+const reviews = JSON.parse(
+  fs.readFileSync(`${__dirname}/reviews.json`, 'utf-8')
 );
 
 // IMPORT DATA INTO DB
 const importData = async () => {
   try {
     await Tour.create(tours);
-      console.log('IMport success');
-      process.exit();
+    await User.create(users, { validateBeforeSave: false });
+    await Review.create(reviews);
+    console.log('IMport success');
+    process.exit();
   } catch (err) {
     console.log(err);
   }
@@ -42,8 +45,10 @@ const importData = async () => {
 const deleteData = async () => {
   try {
     await Tour.deleteMany();
-      console.log('Data deleted success');
-      process.exit();
+    await User.deleteMany();
+    await Review.deleteMany();
+    console.log('Data deleted success');
+    process.exit();
   } catch (err) {
     console.log(err);
   }
@@ -55,16 +60,10 @@ console.log(process.argv);
 //node dev-data/data/import-dev-data.js --import
 //this adds import in the arg array which we will usse:
 if (process.argv[2] === '--import') {
-    importData();
+  importData();
 } else if (process.argv[2] === '--delete') {
-    deleteData();
+  deleteData();
 }
-
-
-
-
-
-
 
 // const fs = require('fs');
 // const mongoose = require('mongoose');
